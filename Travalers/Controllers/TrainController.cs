@@ -14,11 +14,16 @@ namespace Travalers.Controllers
 
         private readonly ITrainRepository _trainRepository;
         private readonly IConfiguration _configuration;
+        private readonly ITicketRepository _ticketRepository;
 
-        public TrainController(ITrainRepository trainRepository, IConfiguration configuration)
+        public TrainController(ITrainRepository trainRepository,
+                              IConfiguration configuration,
+                              ITicketRepository ticketRepository
+                             )
         {
             _trainRepository = trainRepository;
             _configuration = configuration;
+            _ticketRepository = ticketRepository;
         }
 
         [HttpPost("addTrain")]
@@ -108,9 +113,18 @@ namespace Travalers.Controllers
 
             else
             {
-                await _trainRepository.DeleteTrainAsync(id);
+                var tickets = (await _ticketRepository.GetTicketByTrainId(train.Id)).Count();
 
-                return Ok("Train Deleted Successfully");
+                if(tickets == 0)
+                {
+                    await _trainRepository.DeleteTrainAsync(id);
+
+                    return Ok("Train Deleted Successfully");
+                }
+                else
+                {
+                    return BadRequest("Train seats are already booked.");
+                }
             }
         }
     }

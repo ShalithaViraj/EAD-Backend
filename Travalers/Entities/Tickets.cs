@@ -17,5 +17,13 @@ namespace Travalers.Entities
 
         [BsonElement("SeatNumber")]
         public int SeatNumber { get; set; }
+
+        [BsonElement("NoOfSeats")]
+        public int NoOfSeats { get; set; }
+
+        [BsonElement("CreatedDate")]
+        public DateTime CreatedDate { get; set; }
+
+
     }
 }

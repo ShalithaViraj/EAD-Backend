@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,6 +11,7 @@ using Travalers.Repository;
 
 namespace Travalers.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -44,7 +46,7 @@ namespace Travalers.Controllers
             {
                 Username = userDto.Username,
                 PasswordHash = passwordHash,
-                UserType = userDto.UserType,
+                UserType = (Enums.UserType)1,
                 NIC = userDto.NIC,
                 IsActive = true
 
@@ -54,6 +56,7 @@ namespace Travalers.Controllers
 
             return Ok("Registration successful.");
         }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginDto userDto)
@@ -100,6 +103,25 @@ namespace Travalers.Controllers
             return Ok(user);
         }
 
+        [HttpDelete("deactivateUser{id}")]
+        public async Task<ActionResult> DeactivateUser(string id)
+        {
+            var user = await _userRepository.GetUserById(id);
+
+            if (user == null)
+            {
+                return NotFound("User not Found");
+            }
+
+            else
+            {
+                user.IsActive = false;
+
+                await _userRepository.UpdateUserAsync(user);
+
+                return Ok("Train Deleted Successfully");
+            }
+        }
         private string HashPassword(string password)
         {
             using var sha256 = System.Security.Cryptography.SHA256.Create();

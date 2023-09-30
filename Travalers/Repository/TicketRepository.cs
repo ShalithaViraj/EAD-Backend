@@ -46,5 +46,19 @@ namespace Travalers.Repository
             var filter = Builders<Tickets>.Filter.Eq(t => t.Id, id);
             await _ticketsCollection.DeleteOneAsync(filter);
         }
+
+        public async Task<List<Tickets>> GetTicketByUserId(string userId)
+        {
+            var filter = Builders<Tickets>.Filter.Eq(t => t.UserId, userId);
+
+            return await _ticketsCollection.Find(filter).ToListAsync();
+        }
+
+        public async Task<List<Tickets>> GetTicketByTrainId(string trainId)
+        {
+            var filter = Builders<Tickets>.Filter.Eq(t => t.TrainId, trainId);
+
+            return await _ticketsCollection.Find(filter).ToListAsync();
+        }
     }
 }

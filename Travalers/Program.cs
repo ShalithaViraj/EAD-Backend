@@ -49,6 +49,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
+
+
+
 builder.Services.AddSwaggerGen(options =>
 {
 
@@ -95,13 +99,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
 app.UseRouting();
 
 // Enable authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors(x => x
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .SetIsOriginAllowed(origin => true) // allow any origin
+    .AllowCredentials());
 app.MapControllers();
 
 app.Run();

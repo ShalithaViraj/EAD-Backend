@@ -15,5 +15,9 @@ namespace Travalers.Repository
         Task ReserveTicketAsync(string userId, int seatNumber);
 
         Task CancelTicketAsync(string id);
+
+        Task<List<Tickets>> GetTicketByUserId(string userId);
+
+        Task<List<Tickets>> GetTicketByTrainId(string trainId);
     }
 }

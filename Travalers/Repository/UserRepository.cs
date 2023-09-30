@@ -35,5 +35,12 @@ namespace Travalers.Repository
         {
             return await _usersCollection.Find(_ => true).ToListAsync();
         }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            var filter = Builders<User>.Filter.Eq(t => t.Id, user.Id);
+            var options = new ReplaceOptions { IsUpsert = false };
+            await _usersCollection.ReplaceOneAsync(filter, user, options);
+        }
     }
 }

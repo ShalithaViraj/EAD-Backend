@@ -8,6 +8,8 @@ namespace Travalers.Repository
 
         Task CreateUserAsync(User user);
 
+        Task UpdateUserAsync(User user);
+
         Task<User> GetUserById(string id);
 
         Task<List<User>> GetAll();
