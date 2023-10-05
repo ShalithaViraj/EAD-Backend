@@ -31,8 +31,7 @@ namespace Travalers.Controllers
         {
             try
             {
-                
-
+               
                 if (string.IsNullOrEmpty(trainDto.Id))
                 {
 

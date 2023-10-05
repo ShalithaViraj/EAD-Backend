@@ -44,6 +44,7 @@ namespace Travalers.Controllers
 
             var newUser = new User
             {
+                Id = userDto.NIC, 
                 Username = userDto.Username,
                 PasswordHash = passwordHash,
                 UserType = (Enums.UserType)1,
@@ -115,7 +116,15 @@ namespace Travalers.Controllers
 
             else
             {
-                user.IsActive = false;
+                if(user.IsActive == false)
+                {
+                    user.IsActive = true;
+                }
+                else
+                {
+                    user.IsActive = false;
+                }
+                
 
                 await _userRepository.UpdateUserAsync(user);
 
@@ -142,7 +151,7 @@ namespace Travalers.Controllers
 
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, userId),
+            new Claim(JwtRegisteredClaimNames.Sub, nic.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, nic),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

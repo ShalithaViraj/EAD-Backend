@@ -165,6 +165,74 @@ namespace Travalers.Controllers
             }
         }
 
+        [HttpGet("GetTicketByUserIdForAdmin{id}")]
+        public async Task<ActionResult> GetTicketByUserIdForAdmin(string id)
+        {
+            try
+            {
+                var tickets = await _ticketRepository.GetTicketByUserId(id);
+
+                var reservationDtos = new List<ReservationDto>();
+
+                foreach (var ticket in tickets)
+                {
+                    var userName = (await _userRepository.GetUserById(id)).Username;
+                    var trainName = (await _trainRepository.GetTrainById(ticket.TrainId)).Name;
+
+                    var reservationDto = new ReservationDto
+                    {
+                        TrainId = ticket.TrainId,
+                        UserId = ticket.UserId,
+                        UserName = userName,
+                        TrainName = trainName,
+                        SeatNumber = ticket.SeatNumber,
+                    };
+
+                    reservationDtos.Add(reservationDto);
+                }
+
+                return Ok(reservationDtos);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("GetTicketByTrainId{id}")]
+        public async Task<ActionResult> GetTicketByTrainId(string id)
+        {
+            try
+            {
+                var tickets = await _ticketRepository.GetTicketByTrainId(id);
+
+                var reservationDtos = new List<ReservationDto>();
+
+                foreach (var ticket in tickets)
+                {
+                    var userName = (await _userRepository.GetUserById(ticket.UserId)).Username;
+                    var trainName = (await _trainRepository.GetTrainById(ticket.TrainId)).Name;
+
+                    var reservationDto = new ReservationDto
+                    {
+                        TrainId = ticket.TrainId,
+                        UserId = ticket.UserId,
+                        UserName = userName,
+                        TrainName = trainName,
+                        SeatNumber = ticket.SeatNumber,
+                    };
+
+                    reservationDtos.Add(reservationDto);
+                }
+
+                return Ok(reservationDtos);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpDelete("CancelTicket{id}")]
         public async Task<ActionResult> CancelTicket(string id)
         {
