@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -11,13 +12,13 @@ using Travalers.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Register services
+
 builder.Services.AddScoped<IMongoDBContext, MongoDBContext>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITrainRepository, TrainRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
 
 
 // Get JWT key from configuration
@@ -48,10 +49,6 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false
     };
 });
-
-
-
-
 
 builder.Services.AddSwaggerGen(options =>
 {

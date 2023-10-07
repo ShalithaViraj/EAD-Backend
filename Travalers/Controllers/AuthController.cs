@@ -8,6 +8,7 @@ using System.Text;
 using Travalers.DTOs.User;
 using Travalers.Entities;
 using Travalers.Repository;
+using Travalers.Services;
 
 namespace Travalers.Controllers
 {
@@ -18,11 +19,18 @@ namespace Travalers.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly ITicketRepository _ticketRepository;
 
-        public AuthController(IUserRepository userRepository, IConfiguration configuration)
+        public AuthController(IUserRepository userRepository, 
+                              IConfiguration configuration,
+                              ICurrentUserService currentUserService,
+                              ITicketRepository ticketRepository)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _currentUserService = currentUserService;
+            _ticketRepository = ticketRepository;
         }
 
         [HttpPost("register")]
@@ -78,10 +86,26 @@ namespace Travalers.Controllers
             return BadRequest("Invalid username or password.");
         }
 
-        [HttpGet("GetUserById{id}")]
-        public async Task<ActionResult<User>> GetUserById(string id)
+        [HttpPost("updateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] ProfileDto userDto)
         {
-            var user = await _userRepository.GetUserById(id);
+            var userId = _currentUserService.UserId;
+
+            var existingUser = await _userRepository.GetUserByNICAsync(userId);
+
+            existingUser.Username = userDto.Username;
+
+            await _userRepository.UpdateUserAsync(existingUser);
+
+            return Ok("Registration successful.");
+        }
+
+        [HttpGet("GetUserById")]
+        public async Task<ActionResult<User>> GetUserById()
+        {
+            var userId = _currentUserService.UserId;
+
+            var user = await _userRepository.GetUserById(userId);
 
             if (user == null)
             {
@@ -109,6 +133,8 @@ namespace Travalers.Controllers
         {
             var user = await _userRepository.GetUserById(id);
 
+            
+
             if (user == null)
             {
                 return NotFound("User not Found");
@@ -122,10 +148,18 @@ namespace Travalers.Controllers
                 }
                 else
                 {
-                    user.IsActive = false;
+                    var ticketsCount = (await _ticketRepository.GetTicketByUserId(id)).Count();
+
+                    if (ticketsCount > 0)
+                    {
+                        return BadRequest("Cannot Deactivate Due To This User Have Tickets Already");
+                    }
+                    else
+                    {
+                        user.IsActive = false;
+                    }
                 }
                 
-
                 await _userRepository.UpdateUserAsync(user);
 
                 return Ok("Train Deleted Successfully");
